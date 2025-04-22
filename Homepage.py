@@ -46,6 +46,29 @@ class HomePage(tk.Frame):
         self.menu_button = tk.Button(self.logo_frame, text="☰", font=("Arial", 16),
                                    bg="white", bd=0, command=self.toggle_menu)
         self.menu_button.grid(row=0, column=2, sticky="e")
+        # Menu Frame (initially hidden)
+        self.menu_frame = tk.Frame(self, bg="#A8E6EF", width=200)  # Light blue background
+        self.menu_frame.place(x=self.winfo_width(), y=50, width=0, height=300)  # Start with 0 width
+        # Make the menu frame keep its width when shown
+        self.menu_frame.pack_propagate(False)
+        # Menu Options with white background buttons
+        self.menu_options = [
+            ("Main Menu", lambda: self.controller.show_frame("HomePage")),
+            ("Switch\nGame", self.switch_game),
+            ("Calibration", self.show_calibration)
+        ]
+        # Style for menu buttons
+        button_style = {
+            "font": ("Arial", 14),
+            "bg": "white",
+            "bd": 1,
+            "relief": "solid",
+            "width": 15,
+            "height": 2
+        }
+        for i, (text, command) in enumerate(self.menu_options):
+            btn = tk.Button(self.menu_frame, text=text, command=command, **button_style)
+            btn.pack(pady=10, padx=20)
         # Title
         self.title_label = tk.Label(self,
                                   text='"PlayWithGestures - Control Games With Your Hands!"',
@@ -68,6 +91,10 @@ class HomePage(tk.Frame):
         self.play_button.grid(row=3, column=0, pady=20)
         # Initialize video placeholder
         self.init_video_placeholder()
+        # Variables for animation
+        self.menu_visible = False
+        self.animation_running = False
+        self.target_width = 200  # Final width of menu
     def init_video_placeholder(self):
         # Create a play button icon in the video frame
         play_icon = tk.Label(self.video_frame,
@@ -77,7 +104,47 @@ class HomePage(tk.Frame):
                            fg="#333333")
         play_icon.place(relx=0.5, rely=0.5, anchor="center")
     def toggle_menu(self):
-        # TODO: Implement menu toggle functionality
+        """Toggle the menu with animation"""
+        if self.animation_running:
+            return
+        self.animation_running = True
+        if not self.menu_visible:
+            # Show animation
+            self.animate_menu(0, self.target_width, True)
+        else:
+            # Hide animation
+            self.animate_menu(self.target_width, 0, False)
+    def animate_menu(self, start_width, end_width, showing):
+        """Animate the menu sliding"""
+        current_width = start_width
+        step = (end_width - start_width) / 15  # Divide animation into 15 steps
+        def update():
+            nonlocal current_width
+            current_width += step
+            # Check if animation is complete
+            if (step > 0 and current_width >= end_width) or \
+               (step < 0 and current_width <= end_width):
+                current_width = end_width
+                self.menu_visible = showing
+                self.animation_running = False
+                if not showing:
+                    self.menu_frame.place_forget()
+                return
+            # Update menu position and width
+            x = self.winfo_width() - current_width
+            self.menu_frame.place(x=x, y=50, width=current_width, height=300)
+            self.after(10, update)  # Schedule next frame
+        # Start animation
+        if showing:
+            self.menu_frame.place(x=self.winfo_width(), y=50, width=0, height=300)
+        update()
+    def switch_game(self):
+        """Handle game switching"""
+        # TODO: Implement game switching logic
+        pass
+    def show_calibration(self):
+        """Show calibration screen"""
+        # TODO: Implement calibration screen
         pass
     def start_playing(self):
         self.controller.show_frame("GamePage")
