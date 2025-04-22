@@ -40,7 +40,7 @@ class HomePage(tk.Frame):
         self.logo_frame.grid_columnconfigure(0, weight=1)
         self.logo_frame.grid_columnconfigure(2, weight=1)
         # Logo Label
-        self.logo_label = tk.Label(self.logo_frame, text="LOGO", font=("Arial", 16, "bold"), bg="white")
+        self.logo_label = tk.Label(self.logo_frame, text="", font=("Arial", 16, "bold"), bg="white")
         self.logo_label.grid(row=0, column=0, sticky="w")
         # Menu Button
         self.menu_button = tk.Button(self.logo_frame, text="☰", font=("Arial", 16),
